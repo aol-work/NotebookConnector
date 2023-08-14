@@ -120,20 +120,18 @@ def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = Tr
 # @cli.command()
 # @click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
 # @click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be removed")
-def remove(kernel_dir, kernel_name):
+def remove(kernel_name, kernel_dir = None):
     """
     Remove the kernel
     """
     kernel_path = get_kernel_path(kernel_dir)
     kernel_install_path = kernel_path.joinpath(kernel_name)
     if not kernel_install_path.exists():
-        return
-
-    if not click.confirm('Are you sure to delete {} ?'.format(kernel_install_path)):
+        print('Kernal {} at {} does not exist.'.format(kernel_name, kernel_path))
         return
 
     shutil.rmtree(kernel_install_path)
-    click.echo("blender jupyter kernel is removed!")
+    print("{} jupyter kernel is removed!".format(kernel_name))
 
 # def main():
 #     cli()

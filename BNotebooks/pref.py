@@ -43,13 +43,15 @@ class BNotebooksPreferences(bpy.types.AddonPreferences):
             button_install_pkg(col, package.get('name'), version = package.get('version'), desc = package['desc'])
         row = layout.row()
         row.prop(self, 'name')
-        op = row.operator('bn.append_kernel')
+        op = row.operator('bn.kernel_append')
         row.prop(self, 'overwrite')
         op.overwrite = self.overwrite
         op.name = self.name
+        op = row.operator('bn.kernel_remove')
+        op.name = self.name
 
-class BN_Append_Kernal(bpy.types.Operator):
-    bl_idname = "bn.append_kernel"
+class BN_Kernel_Append(bpy.types.Operator):
+    bl_idname = "bn.kernel_append"
     bl_label = "Append Kernel"
     bl_description = "Append this blender's python as a jupyter kernel."
     bl_options = {"REGISTER"}
@@ -76,3 +78,31 @@ class BN_Append_Kernal(bpy.types.Operator):
             overwrite = self.overwrite
             )
         return {"FINISHED"}
+
+class BN_Kernel_Remove(bpy.types.Operator):
+    bl_idname = "bn.kernel_remove"
+    bl_label = "Remove Kernel"
+    bl_description = "Append this blender's python as a jupyter kernel."
+    bl_options = {"REGISTER"}
+    
+    # overwrite: bpy.props.BoolProperty(
+    #     name = 'overwrite', 
+    #     default = True
+    # )
+    
+    name: bpy.props.StringProperty(
+        name = 'Kernel Name', 
+        description = 'Name for the kernel', 
+        default = 'Blender'
+    )
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        installer.remove(
+            kernel_name = self.name
+        )
+        return {"FINISHED"}
+

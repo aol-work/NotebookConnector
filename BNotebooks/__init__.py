@@ -16,13 +16,15 @@ import bpy
 
 # auto_load.init()
 
-from .pref import BNotebooksPreferences, BN_Append_Kernal
+from . import pref
 
 def register():
-    bpy.utils.register_class(BNotebooksPreferences)
-    bpy.utils.register_class(BN_Append_Kernal)
+    bpy.utils.register_class(pref.BNotebooksPreferences)
+    bpy.utils.register_class(pref.BN_Kernel_Append)
+    bpy.utils.register_class(pref.BN_Kernel_Remove)
 
 
 def unregister():
-    bpy.utils.unregister_class(BNotebooksPreferences)
-    bpy.utils.unregister_class(BN_Append_Kernal)
+    bpy.utils.unregister_class(pref.BNotebooksPreferences)
+    bpy.utils.unregister_class(pref.BN_Kernel_Append)
+    bpy.utils.unregister_class(pref.BN_Kernel_Remove)
