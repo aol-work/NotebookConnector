@@ -25,7 +25,7 @@ def get_kernel_path(kernel_dir):
     return kernel_path
 
 
-@click.group()
+# @click.group()
 def cli():
     """
     Command line tool to wrap blender 2.8+ as a jupyter kernel
@@ -33,16 +33,16 @@ def cli():
     pass
 
 
-@cli.command()
-@click.option('--blender-exec', required=True, type=str, help="Path the blender executable")
-@click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
-@click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be installed")
-def install(blender_exec, kernel_dir, kernel_name):
+# @cli.command()
+# @click.option('--blender-exec', required=True, type=str, help="Path the blender executable")
+# @click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
+# @click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be installed")
+def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = True):
     """
     Install kernel to jupyter notebook
     """
     # check version
-    supported_py_version = (3, 7)
+    supported_py_version = (3, 10)
     current_py_version = (sys.version_info.major, sys.version_info.minor)
     if current_py_version != supported_py_version:
         message = """
@@ -63,8 +63,10 @@ def install(blender_exec, kernel_dir, kernel_name):
 
     kernel_install_path = kernel_path.joinpath(kernel_name)
     if kernel_install_path.exists():
-        if not click.confirm('kernel "{}" already exitsts, do you want to overwrite?'.format(kernel_name)):
+        if not overwrite:
+            print('kernel "{}" already exists, not overwriting.'.format(kernel_name))
             return
+        print('kernel "{}" already exists, overwriting.'.format(kernel_name))
         shutil.rmtree(kernel_install_path)
         
     # check files to copy
@@ -115,9 +117,9 @@ def install(blender_exec, kernel_dir, kernel_name):
         json.dump(blender_config_dict, f, indent=2)
 
 
-@cli.command()
-@click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
-@click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be removed")
+# @cli.command()
+# @click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
+# @click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be removed")
 def remove(kernel_dir, kernel_name):
     """
     Remove the kernel
@@ -133,8 +135,8 @@ def remove(kernel_dir, kernel_name):
     shutil.rmtree(kernel_install_path)
     click.echo("blender jupyter kernel is removed!")
 
-def main():
-    cli()
+# def main():
+#     cli()
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
