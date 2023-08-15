@@ -37,14 +37,15 @@ class BNotebooksPreferences(bpy.types.AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text = "Install required ipykernel package, and register with Jupyter.")
         col = layout.column(heading = '', align = False)
+        col.label(text = 'Install required python packages.')
         for package in pkg.get_pkgs().values():
             button_install_pkg(col, package.get('name'), version = package.get('version'), desc = package['desc'])
+        col.label(text = "Manage kernel registration.")
         row = layout.row()
         row.prop(self, 'name')
-        op = row.operator('bn.kernel_append')
         row.prop(self, 'overwrite')
+        op = row.operator('bn.kernel_append')
         op.overwrite = self.overwrite
         op.name = self.name
         op = row.operator('bn.kernel_remove')

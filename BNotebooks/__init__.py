@@ -3,28 +3,26 @@ bl_info = {
     "author": "Brady Johnston",
     "version": (0, 0, 1),
     "blender": (3, 5, 0),
-    "location": "View3D > Add > Mesh > New Object",
+    "location": "Blender Preferences -> Add-ons -> BNotebooks",
     "description": "Makes Blender available as a jupyter kernal.",
     "warning": "",
     "wiki_url": "",
-    "category": "Add Mesh",
+    "category": "Development",
     }
 
-
-import bpy
-# from . import auto_load
-
-# auto_load.init()
-
+from bpy.utils import register_class, unregister_class
 from . import pref
 
-def register():
-    bpy.utils.register_class(pref.BNotebooksPreferences)
-    bpy.utils.register_class(pref.BN_Kernel_Append)
-    bpy.utils.register_class(pref.BN_Kernel_Remove)
+class_list = (
+    pref.BNotebooksPreferences,
+    pref.BN_Kernel_Append,
+    pref.BN_Kernel_Remove
+)
 
+def register():
+    for c in class_list:
+        register_class(c)
 
 def unregister():
-    bpy.utils.unregister_class(pref.BNotebooksPreferences)
-    bpy.utils.unregister_class(pref.BN_Kernel_Append)
-    bpy.utils.unregister_class(pref.BN_Kernel_Remove)
+    for c in class_list:
+        unregister_class(c)

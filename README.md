@@ -1,57 +1,16 @@
-# Blender Notebook
+# BNotebooks
 
-A simple command line tool to wrap blender 2.8+ as a jupyter kernel.
-
-Blender's python API requires its embedded python interpreter. As of Blender 2.82, python 3.7 is packaged. In order to make ipykernel and other pip packages accessible to Blender, the `site-packages` directory of the python interpreter executing blender_notebook will be added to Blender's python path. Therefore, it's highly recommended to use exactly the same python version as your blender.
+A Blender add-on that enables the use of Blender as a kernel for Jupyter Notebooks.
 
 ## Installation
+Install the `addon.zip` via the `Addons` tab in the `Preferences`.
 
-The easiest way to install blender_notebook is via pip:
-```
-$ python -m pip install blender_notebook
-```
+`Blender Prefernces` -> `Add-ons` -> `Install` 
 
-It can also be installed from source:
-```
-$ python -m pip install -e .
-```
+Select the `BNotebooks_X.zip`. Click the top left tick box to enable the addon, which will display the add-on preferences. Click the `Install ipykernel` button to install the required package, then click `Append Kernel` to register this Blender as a kernel for use in Jupyter Notebooks.
 
-## Usage
+You can then click the button in the preferences, registering the current Blender version as a kernel to be used by Jupyter Notebooks.
 
-If blender in installed by a package manager, the easiest way to find the executable path is:
-```
-$ which blender
-/snap/bin/blender
-```
-In my case, blender is installed from snap.
+![](https://i.imgur.com/FcB230V.png)
 
-On MacOS, the blender executable path is usually:
-```
-/Applications/Blender.app/Contents/MacOS/Blender
-```
-
-On Windows, the blender executable path is usually:
-```
-C:\Program Files\Blender Foundation\Blender 2.82\blender.exe
-```
-
-Then, run the blender_notebook CLI (replace `"snap/bin/blender"` with your blender executable path):
-```
-$ blender_notebook install --blender-exec="/snap/bin/blender"
-Saving files to ~/.local/share/jupyter/kernels/blender
-```
-If you launch jupyter notebook as usual, a new kernel named `blender` should be available.
-```
-$ jupyter kernelspec list
-Available kernels:
-blender              ~/.local/share/jupyter/kernels/blender
-
-$ jupyter notebook
-```
-
-You can also delete the kernel:
-```
-$ blender_notebook remove
-Are you sure to delete ~/.local/share/jupyter/kernels/blender ? [y/N]: y
-blender jupyter kernel is removed!
-```
+### This Blender version will now be available as a jupyter kernel.
