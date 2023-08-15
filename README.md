@@ -2,6 +2,8 @@
 
 A Blender add-on that enables the use of Blender as a kernel for Jupyter Notebooks.
 
+This is a repackaging of [`blender_notebook`](https://github.com/cheng-chi/blender_notebook), but as an installable Blender add-on. Packaging it as an add-on removes the need for another python environment for installation, and keeps Blender's bundled python environment more isolated for better reproducibility.
+
 ## Installation
 Install the `addon.zip` via the `Addons` tab in the `Preferences`.
 
