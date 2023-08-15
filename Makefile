@@ -1,4 +1,4 @@
-version := $(shell grep version pyproject.toml | grep -o -E "\b[0-9]+\.[0-9]+\.[0-9]+\b")
+version := $(shell grep version setup.py | grep -o -E "\b[0-9]+\.[0-9]+\.[0-9]+\b")
 
 release:
 	git clean -dfX
