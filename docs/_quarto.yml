@@ -1,0 +1,26 @@
+project:
+  type: website
+  output-dir: _build
+
+website:
+  title: "BNotebooks"
+  sidebar:
+    style: floating
+    contents:
+      - href: index.qmd
+        text: Home
+      # - about.qmd
+    tools:
+      - icon: github
+        href: https://github.com/BradyAJohnston/BNotebooks
+  page-footer:
+    left: "This site is built with ❤️ and [Quarto](https://quarto.org/)."
+    background: "#F8F9FA"
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+
