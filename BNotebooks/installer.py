@@ -39,10 +39,7 @@ def get_kernel_path(kernel_dir):
         kernel_path = pathlib.Path(data_dir).joinpath("kernels")
     if not kernel_path.exists():
         click.echo(f"Kernel path {kernel_path} does not exist!")
-        if click.confirm("Are you sure to create?"):
-            kernel_path.mkdir(parents=True, exist_ok=True)
-        else:
-            raise RuntimeError("Abort!")
+        kernel_path.mkdir(parents=True, exist_ok=True)
     return kernel_path
 
 
