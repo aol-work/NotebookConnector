@@ -1,3 +1,5 @@
+from . import pkg
+
 bl_info = {
     "name": "BNotebooks",
     "author": "Brady Johnston",
@@ -16,7 +18,8 @@ from . import pref
 class_list = (
     pref.BNotebooksPreferences,
     pref.BN_Kernel_Append,
-    pref.BN_Kernel_Remove
+    pref.BN_Kernel_Remove,
+    pkg.MOL_OT_Install_Package
 )
 
 def register():
