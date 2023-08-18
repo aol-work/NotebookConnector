@@ -8,12 +8,35 @@ import json
 import sys
 import textwrap
 
+
+def get_jupyter_path():
+    import bpy
+    import os
+
+    # Get the directory of Blender's Python binary
+    blender_python_dir = os.path.dirname(bpy.app.binary_path)
+    blender_version = ".".join(bpy.app.version_string.split(".")[:2])
+
+    # Determine the path to the jupyter command based on the operating system
+    if os.name == 'nt':  # Windows
+        jupyter_path = os.path.join(
+            blender_python_dir, blender_version, "python", 'Scripts',
+            'jupyter.exe')
+    else:  # Linux/Mac
+        jupyter_path = os.path.join(
+            blender_python_dir, blender_version, "python", 'bin', 'jupyter')
+
+    return jupyter_path
+
+
 def get_kernel_path(kernel_dir):
     kernel_path = None
     if kernel_dir:
         kernel_path = pathlib.Path(kernel_dir)
     else:
-        result = subprocess.run(["jupyter", "--data-dir"], capture_output=True)
+        jupyter_path = get_jupyter_path()
+        result = subprocess.run([jupyter_path, "--data-dir"],
+                                capture_output=True)
         data_dir = result.stdout.decode('utf8').strip()
         kernel_path = pathlib.Path(data_dir).joinpath('kernels')
     if not kernel_path.exists():
