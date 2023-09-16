@@ -1,1 +1,3 @@
 ipykernel==6.25.1    # Install to enable connection to notebooks.
+click==8.1.7         # Some modules needs the click to be installed.
+jupyterlab==4.0.5    # To have access to the jupyter binary file.

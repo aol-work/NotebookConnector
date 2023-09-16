@@ -1,27 +1,45 @@
-import click
+import json
+import os
 import pathlib
 import shutil
 import subprocess
-import os
-import site
-import json
 import sys
 import textwrap
+import bpy
+import click
+
+
+def get_jupyter_path():
+
+    # Get the directory of Blender's Python binary
+    blender_python_dir = os.path.dirname(bpy.app.binary_path)
+    blender_version = ".".join(bpy.app.version_string.split(".")[:2])
+
+    # Determine the path to the jupyter command based on the operating system
+    if os.name == "nt":  # Windows
+        jupyter_path = os.path.join(
+            blender_python_dir, blender_version, "python", "Scripts",
+            "jupyter.exe")
+    else:  # Linux/Mac
+        jupyter_path = os.path.join(
+            blender_python_dir, blender_version, "python", "bin", "jupyter")
+
+    return jupyter_path
+
 
 def get_kernel_path(kernel_dir):
     kernel_path = None
     if kernel_dir:
         kernel_path = pathlib.Path(kernel_dir)
     else:
-        result = subprocess.run(["jupyter", "--data-dir"], capture_output=True)
-        data_dir = result.stdout.decode('utf8').strip()
-        kernel_path = pathlib.Path(data_dir).joinpath('kernels')
+        jupyter_path = get_jupyter_path()
+        result = subprocess.run([jupyter_path, "--data-dir"],
+                                capture_output=True)
+        data_dir = result.stdout.decode("utf8").strip()
+        kernel_path = pathlib.Path(data_dir).joinpath("kernels")
     if not kernel_path.exists():
-        click.echo("Kernel path {} does not exist!".format(kernel_path))
-        if click.confirm("Are you sure to create?"):
-            kernel_path.mkdir(parents=True, exist_ok=True)
-        else:
-            raise RuntimeError("Abort!")
+        click.echo(f"Kernel path {kernel_path} does not exist!")
+        kernel_path.mkdir(parents=True, exist_ok=True)
     return kernel_path
 
 
@@ -34,10 +52,14 @@ def cli():
 
 
 # @cli.command()
-# @click.option('--blender-exec', required=True, type=str, help="Path the blender executable")
-# @click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
-# @click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be installed")
-def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = True):
+# @click.option("--blender-exec", required=True, type=str,
+#               help="Path the blender executable")
+# @click.option("--kernel-dir", default=None, type=str,
+#               help="Path to jupyter"s kernels directory")
+# @click.option("--kernel-name", default="blender", type=str,
+#               help="Name of the kernel to be installed")
+def install(blender_exec, kernel_dir=None, kernel_name="blender",
+            overwrite=True):
     """
     Install kernel to jupyter notebook
     """
@@ -47,9 +69,10 @@ def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = Tr
     if current_py_version != supported_py_version:
         message = """
         Current python interpreter version is not {}.{}!
-        blender_notebook will link pip packages installed in this interpreter to the 
-        blender embedded python interpreter. Mismatch in python version might cause
-        problem launching the jupyter kernel. Are you sure to continue?
+        blender_notebook will link pip packages installed in this interpreter
+        to the blender embedded python interpreter. Mismatch in python version
+        might cause problem launching the jupyter kernel. Are you sure to
+        continue?
         """.format(*supported_py_version)
         if not click.confirm(textwrap.dedent(message)):
             return
@@ -64,25 +87,27 @@ def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = Tr
     kernel_install_path = kernel_path.joinpath(kernel_name)
     if kernel_install_path.exists():
         if not overwrite:
-            print('kernel "{}" already exists, not overwriting.'.format(kernel_name))
+            print(f"kernel '{kernel_name}' already exists, not overwriting.")
             return
-        print('kernel "{}" already exists, overwriting.'.format(kernel_name))
+        print(f"kernel '{kernel_name}' already exists, overwriting.")
         shutil.rmtree(kernel_install_path)
-        
+
     # check files to copy
-    kernel_py_path = pathlib.Path(__file__).parent.joinpath('kernel.py')
-    kernel_launcher_py_path = pathlib.Path(__file__).parent.joinpath('kernel_launcher.py')
-    assert(kernel_py_path.exists())
-    assert(kernel_launcher_py_path.exists())
+    kernel_py_path = pathlib.Path(__file__).parent.joinpath("kernel.py")
+    kernel_launcher_py_path = pathlib.Path(__file__).parent.joinpath(
+        "kernel_launcher.py")
+    assert (kernel_py_path.exists())
+    assert (kernel_launcher_py_path.exists())
 
     # start dumping files
-    click.echo("Saving files to {}".format(kernel_install_path))
+    click.echo(f"Saving files to {kernel_install_path}")
     # create directory
     kernel_install_path.mkdir()
 
     # copy python files
     kernel_py_dst = kernel_install_path.joinpath(kernel_py_path.name)
-    kernel_launcher_py_dst = kernel_install_path.joinpath(kernel_launcher_py_path.name)
+    kernel_launcher_py_dst = kernel_install_path.joinpath(
+        kernel_launcher_py_path.name)
 
     shutil.copyfile(kernel_py_path, kernel_py_dst)
     shutil.copyfile(kernel_launcher_py_path, kernel_launcher_py_dst)
@@ -98,8 +123,8 @@ def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = Tr
     kernel_dict = {
         "argv": [
             sys.executable,
-            str(kernel_launcher_py_dst), 
-            "-f", 
+            str(kernel_launcher_py_dst),
+            "-f",
             r"{connection_file}"],
         "display_name": kernel_name,
         "language": "python"
@@ -108,33 +133,36 @@ def install(blender_exec, kernel_dir=None, kernel_name='blender', overwrite = Tr
         "blender_executable": str(blender_exec),
         "python_path": python_path,
     }
-    kernel_json_dst = kernel_install_path.joinpath('kernel.json')
-    blender_config_json_dst = kernel_install_path.joinpath('blender_config.json')
+    kernel_json_dst = kernel_install_path.joinpath("kernel.json")
+    blender_config_json_dst = kernel_install_path.joinpath(
+        "blender_config.json")
 
-    with kernel_json_dst.open('w') as f:
+    with kernel_json_dst.open("w") as f:
         json.dump(kernel_dict, f, indent=2)
-    with blender_config_json_dst.open('w') as f:
+    with blender_config_json_dst.open("w") as f:
         json.dump(blender_config_dict, f, indent=2)
 
 
 # @cli.command()
-# @click.option('--kernel-dir', default=None, type=str, help="Path to jupyter's kernels directory")
-# @click.option('--kernel-name', default='blender', type=str, help="Name of the kernel to be removed")
-def remove(kernel_name, kernel_dir = None):
+# @click.option("--kernel-dir", default=None, type=str,
+#               help="Path to jupyter"s kernels directory")
+# @click.option("--kernel-name", default="blender", type=str,
+#               help="Name of the kernel to be removed")
+def remove(kernel_name, kernel_dir=None):
     """
     Remove the kernel
     """
     kernel_path = get_kernel_path(kernel_dir)
     kernel_install_path = kernel_path.joinpath(kernel_name)
     if not kernel_install_path.exists():
-        print('Kernal {} at {} does not exist.'.format(kernel_name, kernel_path))
+        print(f"Kernal {kernel_name} at {kernel_path} does not exist.")
         return
 
     shutil.rmtree(kernel_install_path)
-    print("{} jupyter kernel is removed!".format(kernel_name))
+    print(f"{kernel_name} jupyter kernel is removed!")
 
 # def main():
 #     cli()
 
-# if __name__ == '__main__':
+# if __name__ == "__main__":
 #     main()
