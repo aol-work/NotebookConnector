@@ -7,7 +7,7 @@ from . import pkg, pref
 bl_info = {
     "name": "BNotebooks",
     "author": "Brady Johnston",
-    "version": (0, 0, 3),
+    "version": (0, 0, 4),
     "blender": (3, 5, 0),
     "location": "Blender Preferences -> Add-ons -> BNotebooks",
     "description": "Makes Blender available as a jupyter kernal.",
