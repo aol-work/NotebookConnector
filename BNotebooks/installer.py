@@ -6,15 +6,24 @@ import subprocess
 import sys
 import textwrap
 import bpy
-
+import platform
 from .pkg import start_logging
 
 log = start_logging()
+_is_apple_silicon = (sys.platform == "darwin") and ('arm' in platform.machine())
+
 
 def get_jupyter_path():
 
     # Get the directory of Blender's Python binary
-    blender_python_dir = os.path.dirname(bpy.app.binary_path)
+    if _is_apple_silicon:
+        # python is stored in /Applications/Blender.app/Contents/Resources/3.6/python/bin/
+        # blender binary is stored in /Applications/Blender.app/Contents/MacOS
+        binary_path = os.path.dirname(bpy.app.binary_path)
+        new_path = os.path.join(binary_path, "../Resources/")
+        blender_python_dir = os.path.abspath(new_path)
+    else:
+        blender_python_dir = os.path.dirname(bpy.app.binary_path)
     blender_version = ".".join(bpy.app.version_string.split(".")[:2])
 
     # Determine the path to the jupyter command based on the operating system
