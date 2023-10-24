@@ -6,10 +6,12 @@ import subprocess
 import sys
 import textwrap
 import bpy
-import click
 import platform
+from .pkg import start_logging
 
+log = start_logging()
 _is_apple_silicon = (sys.platform == "darwin") and ('arm' in platform.machine())
+
 
 def get_jupyter_path():
 
@@ -47,26 +49,11 @@ def get_kernel_path(kernel_dir):
         data_dir = result.stdout.decode("utf8").strip()
         kernel_path = pathlib.Path(data_dir).joinpath("kernels")
     if not kernel_path.exists():
-        click.echo(f"Kernel path {kernel_path} does not exist!")
+        log.info(f"Kernel path {kernel_path} does not exist!")
         kernel_path.mkdir(parents=True, exist_ok=True)
     return kernel_path
 
 
-# @click.group()
-def cli():
-    """
-    Command line tool to wrap blender 2.8+ as a jupyter kernel
-    """
-    pass
-
-
-# @cli.command()
-# @click.option("--blender-exec", required=True, type=str,
-#               help="Path the blender executable")
-# @click.option("--kernel-dir", default=None, type=str,
-#               help="Path to jupyter"s kernels directory")
-# @click.option("--kernel-name", default="blender", type=str,
-#               help="Name of the kernel to be installed")
 def install(blender_exec, kernel_dir=None, kernel_name="blender",
             overwrite=True):
     """
@@ -83,8 +70,7 @@ def install(blender_exec, kernel_dir=None, kernel_name="blender",
         might cause problem launching the jupyter kernel. Are you sure to
         continue?
         """.format(*supported_py_version)
-        if not click.confirm(textwrap.dedent(message)):
-            return
+        log.info(textwrap.dedent(message))
 
     # check input
     blender_path = pathlib.Path(blender_exec)
@@ -109,7 +95,7 @@ def install(blender_exec, kernel_dir=None, kernel_name="blender",
     assert (kernel_launcher_py_path.exists())
 
     # start dumping files
-    click.echo(f"Saving files to {kernel_install_path}")
+    log.info(f"Saving files to {kernel_install_path}")
     # create directory
     kernel_install_path.mkdir()
 
@@ -152,11 +138,6 @@ def install(blender_exec, kernel_dir=None, kernel_name="blender",
         json.dump(blender_config_dict, f, indent=2)
 
 
-# @cli.command()
-# @click.option("--kernel-dir", default=None, type=str,
-#               help="Path to jupyter"s kernels directory")
-# @click.option("--kernel-name", default="blender", type=str,
-#               help="Name of the kernel to be removed")
 def remove(kernel_name, kernel_dir=None):
     """
     Remove the kernel
@@ -169,9 +150,3 @@ def remove(kernel_name, kernel_dir=None):
 
     shutil.rmtree(kernel_install_path)
     print(f"{kernel_name} jupyter kernel is removed!")
-
-# def main():
-#     cli()
-
-# if __name__ == "__main__":
-#     main()
