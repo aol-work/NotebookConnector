@@ -5,7 +5,7 @@ with pathlib.Path(__file__).parent.joinpath('README.md').open('r', encoding='utf
 
 setup(
     name = "BNotebooks",
-    version = "0.0.4",
+    version = "0.0.5",
     description = "A command line tool to wrap blender as a jupyter kernel",
     long_description = long_description,
     long_description_content_type = 'text/markdown',
