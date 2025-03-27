@@ -109,12 +109,19 @@ bpy.ops.asyncio.tmp_timer()
 
 @persistent
 def loadHandler(dummy):
-    bpy.ops.asyncio.jupyter_kernel_loop()
+    if getattr(bpy.app, "load_handler_first_time", False):
+        bpy.ops.asyncio.jupyter_kernel_loop()
+    else:
+        print("Skipping Jupyter kernel loop once in loadHandler...")
+        bpy.app.load_handler_first_time = False
 
     # If call tmp_timer here instead, kernel doesn't work on successive files
     # if have used kernel in current file.
 
 
+# We start this immediately as on first load plugins loading can lead to
+# a devastating timeout on the Jupyter server side.
+bpy.ops.asyncio.jupyter_kernel_loop()
 bpy.app.handlers.load_post.append(loadHandler)
 
 # Need the timer hack because if immediately call registered operation, get
